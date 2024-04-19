@@ -38,7 +38,7 @@ jobs:
 
       - name: Install dependencies
         if: steps.release-check.outputs.release == '1'
-        uses: ./actions/yarn-cache
+        uses: ./actions/yarnCache
 
       - name: Build dependencies
         if: steps.release-check.outputs.release == '1'
