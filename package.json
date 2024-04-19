@@ -1,6 +1,6 @@
 {
   "name": "@sirh/discord-http-webserver",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Library for Discord HTTP Interactions",
   "main": "dist/src/index.js",
   "module": "dist/src/index.mjs",
