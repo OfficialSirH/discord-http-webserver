@@ -2,9 +2,9 @@
   "name": "@sirh/discord-http-webserver",
   "version": "0.1.1",
   "description": "Library for Discord HTTP Interactions",
-  "main": "dist/src/index.js",
-  "module": "dist/src/index.mjs",
-  "typings": "dist/src/index.d.ts",
+  "main": "dist/index.cjs",
+  "module": "dist/index.js",
+  "typings": "dist/index.d.ts",
   "author": "SirH",
   "publishConfig": {
     "access": "public"
@@ -35,13 +35,13 @@
   "exports": {
     ".": {
       "node": {
-        "require": {
-          "types": "./dist/index.d.cts",
-          "default": "./dist/index.cjs"
-        },
         "import": {
           "types": "./dist/index.d.ts",
           "default": "./dist/index.js"
+        },
+        "require": {
+          "types": "./dist/index.d.cts",
+          "default": "./dist/index.cjs"
         }
       }
     }
