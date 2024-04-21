@@ -27,6 +27,9 @@ jobs:
         with:
           node-version: 18
           registry-url: https://registry.npmjs.org/
+          cache: 'yarn'
+      - run: yarn install --frozen-lockfile
+      - run: yarn test
 
       - name: Check the current development version
         id: release-check
@@ -35,10 +38,6 @@ jobs:
             then echo "RELEASE=0" >> "$GITHUB_OUTPUT"; \
             else echo "RELEASE=1" >> "$GITHUB_OUTPUT"; \
           fi
-
-      - name: Install dependencies
-        if: steps.release-check.outputs.release == '1'
-        uses: ./actions/yarnCache
 
       - name: Build dependencies
         if: steps.release-check.outputs.release == '1'
