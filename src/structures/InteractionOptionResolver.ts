@@ -10,7 +10,7 @@ import {
   type APIRole,
   type APIUser,
   type Snowflake,
-} from '@discordjs/core';
+} from 'discord-api-types/v10';
 import { InteractionOption } from './InteractionOption.js';
 
 export class InteractionOptionResolver {

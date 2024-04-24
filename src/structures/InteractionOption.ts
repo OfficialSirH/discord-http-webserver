@@ -1,4 +1,4 @@
-import type { APIApplicationCommandInteractionDataOption, ApplicationCommandOptionType } from '@discordjs/core';
+import type { APIApplicationCommandInteractionDataOption, ApplicationCommandOptionType } from 'discord-api-types/v10';
 
 export class InteractionOption {
   public readonly name: string;

@@ -1,3 +1,4 @@
+import { Result } from '@sapphire/result';
 import {
   ApplicationCommandType,
   InteractionType,
@@ -11,8 +12,7 @@ import {
   type APIModalSubmitInteraction,
   type RESTPostAPIApplicationCommandsJSONBody,
   type Snowflake,
-} from '@discordjs/core';
-import { Result } from '@sapphire/result';
+} from 'discord-api-types/v10';
 import type { FastifyReply } from 'fastify';
 import {
   componentInteractionDefaultParser,

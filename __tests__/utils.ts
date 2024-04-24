@@ -6,7 +6,7 @@ import {
   type APIChatInputApplicationCommandInteraction,
   type APIContextMenuInteraction,
   type APIInteraction,
-} from '@discordjs/core';
+} from 'discord-api-types/v10';
 import type { CustomIdData } from '../src/components';
 import type { Client } from '../src/structures/Client';
 

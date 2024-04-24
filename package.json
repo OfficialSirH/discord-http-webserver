@@ -11,12 +11,10 @@
   },
   "type": "module",
   "dependencies": {
-    "@discordjs/builders": "^1.7.0",
     "@discordjs/collection": "^2.0.0",
-    "@discordjs/core": "^1.1.1",
     "@discordjs/rest": "^2.2.0",
     "@sapphire/result": "^2.6.6",
-    "dotenv": "^16.4.5",
+    "discord-api-types": "^0.37.81",
     "fastify": "^4.26.2",
     "form-data-encoder": "^4.0.2",
     "tweetnacl": "^1.0.3",

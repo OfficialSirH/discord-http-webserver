@@ -1,4 +1,6 @@
 import { Collection } from '@discordjs/collection';
+import { REST } from '@discordjs/rest';
+import type { Result } from '@sapphire/result';
 import {
   ApplicationCommandType,
   InteractionResponseType,
@@ -11,9 +13,7 @@ import {
   type APIInteraction,
   type APIMessageComponentInteraction,
   type Snowflake,
-} from '@discordjs/core';
-import { REST } from '@discordjs/rest';
-import type { Result } from '@sapphire/result';
+} from 'discord-api-types/v10';
 import fastify, { type FastifyInstance } from 'fastify';
 import { readdir } from 'fs/promises';
 import { dirname, join } from 'node:path';

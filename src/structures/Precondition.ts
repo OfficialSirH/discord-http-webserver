@@ -1,5 +1,5 @@
-import type { APIChatInputApplicationCommandInteraction, APIContextMenuInteraction } from '@discordjs/core';
 import { Result } from '@sapphire/result';
+import type { APIChatInputApplicationCommandInteraction, APIContextMenuInteraction } from 'discord-api-types/v10';
 import type { Client } from './Client.js';
 
 export class Precondition {

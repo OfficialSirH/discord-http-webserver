@@ -1,5 +1,5 @@
-import { type APIMessageComponentInteraction, type Snowflake } from '@discordjs/core';
 import { Result } from '@sapphire/result';
+import { type APIMessageComponentInteraction, type Snowflake } from 'discord-api-types/v10';
 
 /**
  * The base interface for interacting with the default parsed data.

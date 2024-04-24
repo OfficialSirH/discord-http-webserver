@@ -1,15 +1,15 @@
+import type { REST, RawFile } from '@discordjs/rest';
+import { Blob } from 'buffer';
 import {
   InteractionResponseType,
-  WebhooksAPI,
+  Routes,
   type APICommandAutocompleteInteractionResponseCallbackData,
   type APIInteraction,
   type APIInteractionResponse,
   type APIInteractionResponseCallbackData,
   type APIModalInteractionResponseCallbackData,
   type Snowflake,
-} from '@discordjs/core';
-import type { REST, RawFile } from '@discordjs/rest';
-import { Blob } from 'buffer';
+} from 'discord-api-types/v10';
 import type { FastifyReply } from 'fastify';
 import { FormDataEncoder } from 'form-data-encoder';
 import { Readable } from 'stream';
@@ -17,17 +17,15 @@ import { FormData } from 'undici';
 import type { Attachment } from './Attachment.js';
 
 export class FastifyBasedAPI {
-  readonly webhooks: WebhooksAPI;
   readonly interactions: FastifyBasedInteractionsAPI;
 
   constructor(rest: REST) {
-    this.webhooks = new WebhooksAPI(rest);
-    this.interactions = new FastifyBasedInteractionsAPI(this.webhooks);
+    this.interactions = new FastifyBasedInteractionsAPI(rest);
   }
 }
 
 export class FastifyBasedInteractionsAPI {
-  constructor(readonly webhooks: WebhooksAPI) {}
+  constructor(readonly rest: REST) {}
 
   async resolveData(
     callbackData: Omit<
@@ -96,7 +94,7 @@ export class FastifyBasedInteractionsAPI {
   }
 
   async followUp(interaction: APIInteraction, data: APIInteractionResponseCallbackData & { files?: RawFile[] }) {
-    await this.webhooks.execute(interaction.id, interaction.token, data);
+    await this.rest.post(Routes.webhook(interaction.application_id, interaction.token), data);
   }
 
   async editReply(
@@ -104,15 +102,15 @@ export class FastifyBasedInteractionsAPI {
     data: APIInteractionResponseCallbackData & { files?: RawFile[] },
     messageId: Snowflake = '@original',
   ) {
-    await this.webhooks.editMessage(interaction.application_id, interaction.token, messageId, data);
+    await this.rest.patch(Routes.webhookMessage(interaction.application_id, interaction.token, messageId), data);
   }
 
   async getOriginalReply(interaction: APIInteraction) {
-    return this.webhooks.getMessage(interaction.application_id, interaction.token, '@original');
+    return this.rest.get(Routes.webhookMessage(interaction.application_id, interaction.token, '@original'));
   }
 
   async deleteReply(interaction: APIInteraction, messageId: Snowflake = '@original') {
-    await this.webhooks.deleteMessage(interaction.application_id, interaction.token, messageId);
+    await this.rest.delete(Routes.webhookMessage(interaction.application_id, interaction.token, messageId));
   }
 
   async updateMessage(
