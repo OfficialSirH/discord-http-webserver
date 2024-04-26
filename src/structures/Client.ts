@@ -15,7 +15,8 @@ import {
   type Snowflake,
 } from 'discord-api-types/v10';
 import fastify, { type FastifyInstance } from 'fastify';
-import { readdir } from 'fs/promises';
+import { existsSync, type PathLike } from 'fs';
+import { readdir, stat } from 'fs/promises';
 import { dirname, join } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import nacl from 'tweetnacl';
@@ -73,6 +74,7 @@ export class Client {
     this.rest = rest;
     this.rest.setToken(token);
     this.api = new FastifyBasedAPI(this.rest);
+    this.#__dirname = this.#getProjectRoot();
   }
 
   public customGlobalComponentPreparser?: (
@@ -203,18 +205,45 @@ export class Client {
     await this.server.listen({ port: this.port, host: '0.0.0.0' });
   }
 
+  #__dirname: string;
+
+  #getProjectRoot() {
+    let __dirname = dirname(fileURLToPath(import.meta.url));
+    while (
+      !existsSync(join(__dirname, 'package.json')) ||
+      dirname(join(__dirname, '..')).split('\\').pop() === 'node_modules' ||
+      dirname(join(__dirname, '..')).split('\\').pop()?.startsWith('@')
+    ) {
+      __dirname = join(__dirname, '..');
+    }
+    return __dirname;
+  }
+
+  async #exists(path: PathLike): Promise<boolean> {
+    try {
+      await stat(path);
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
   async loadCommands() {
-    const __dirname = dirname(fileURLToPath(import.meta.url));
+    const commandsFolder = pathToFileURL(join(this.#__dirname, '..', 'commands'));
+    if (!(await this.#exists(commandsFolder))) {
+      this.logger.warn('commands folder does not exist');
+      return;
+    }
     const commandFiles = (
       await Promise.all(
         // read the commands folder, retrieving all of the command categories(folders)
-        (await readdir(pathToFileURL(join(__dirname, '..', 'commands')))).map(async folder => {
+        (await readdir(commandsFolder)).map(async folder => {
           // read the command category folder, retrieving all of the command files
           const recursivelyCheckedfolders = await Promise.all(
-            (await readdir(pathToFileURL(join(__dirname, '..', 'commands', folder)))).map(async fileOrFolder => {
+            (await readdir(pathToFileURL(join(commandsFolder.toString(), folder)))).map(async fileOrFolder => {
               // if the fileOrFolder is a folder, read the folder, retrieving all of the command files within the subcategory
               if (!fileOrFolder.includes('.'))
-                return (await readdir(pathToFileURL(join(__dirname, '..', 'commands', folder, fileOrFolder))))
+                return (await readdir(pathToFileURL(join(commandsFolder.toString(), folder, fileOrFolder))))
                   .filter(file => file.endsWith('.js'))
                   .map(file => join(folder, fileOrFolder, file));
               return fileOrFolder;
@@ -232,7 +261,7 @@ export class Client {
     ).flat();
 
     for (const file of commandFiles) {
-      const command = new (await import(pathToFileURL(join(__dirname, '..', 'commands', file)).toString())).default(
+      const command = new (await import(pathToFileURL(join(commandsFolder.toString(), file)).toString())).default(
         this,
       ) as Command;
       this.cache.handles.commands.set(command.name, command);
@@ -240,14 +269,16 @@ export class Client {
   }
 
   async loadPreconditions() {
-    const __dirname = dirname(fileURLToPath(import.meta.url));
-    const preconditionFiles = (await readdir(pathToFileURL(join(__dirname, '..', 'preconditions')))).filter(file =>
-      file.endsWith('.js'),
-    );
+    const preconditionFolder = pathToFileURL(join(this.#__dirname, '..', 'preconditions'));
+    if (!(await this.#exists(preconditionFolder))) {
+      this.logger.warn('preconditions folder does not exist');
+      return;
+    }
+    const preconditionFiles = (await readdir(preconditionFolder)).filter(file => file.endsWith('.js'));
 
     for (const file of preconditionFiles) {
       const precondition = new (
-        await import(pathToFileURL(join(__dirname, '..', 'preconditions', file)).toString())
+        await import(pathToFileURL(join(preconditionFolder.toString(), file)).toString())
       ).default(this) as Precondition;
       this.cache.handles.preconditions.set(precondition.name, precondition);
     }
